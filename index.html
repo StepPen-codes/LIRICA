@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIRICA</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@700&family=Roboto:wght@500&display=swap");
+      :root {
+        --col1: #383838;
+        --col2: #066163;
+        --col3: #cdbe78;
+        --col4: #f2f2f2;
+      }
+      body {
+        margin: 0;
+        display: flex;
+        font-family: "Exo 2", sans-serif;
+      }
+      #toggle {
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      section {
+        height: 100vh;
+        width: 100vw;
+        padding: 1rem;
+      }
+      textarea {
+        height: 100%;
+        width: 100%;
+        outline: 0;
+        border: 0;
+        resize: none;
+      }
+      .hide {
+        display: none;
+      }
+      #show {
+        font-family: "arial", sans-serif;
+        font-weight: bold;
+        display: flex;
+        background: var(--col3);
+        flex-direction: column;
+        justify-content: center;
+        font-size: 64px;
+        padding: 1.2em;
+        overflow-y: hidden;
+      }
+      #show :is(div:nth-child(1), div:nth-child(3)) {
+        letter-spacing: 0.1em;
+        font-size: 56px;
+        color: var(--col4);
+      }
+      #show div:nth-child(2) {
+        letter-spacing: 0.1em;
+        color: var(--col1);
+      }
+      #toggle {
+        background: 0;
+        border: 0;
+        letter-spacing: 0.2em;
+        color: var(--col1);
+        font-family: "exo 2", sans-serif;
+      }
+
+    </style>
+</head>
+<body>
+  <section id="edit" class="hide">
+    <textarea></textarea>
+  </section>
+  <section id="show">
+    <div></div>
+    <div></div>
+    <div></div>
+  </section>
+  <button id="toggle">LIRICA</button>
+<script>
+  const edit = document.querySelector("#edit textarea");
+const show = document.querySelector("#show");
+const showDiv = document.querySelectorAll("#show div");
+const toggle = document.querySelector("#toggle");
+
+const Lyrics = {
+  raw: "",
+  lines: [],
+  index: 0
+};
+function render() {
+  showDiv[0].innerText = Lyrics.lines[Lyrics.index - 1]
+    ? Lyrics.lines[Lyrics.index - 1]
+    : " ";
+  showDiv[1].innerText = Lyrics.lines[Lyrics.index]
+    ? Lyrics.lines[Lyrics.index]
+    : " ";
+  showDiv[2].innerText = Lyrics.lines[Lyrics.index + 1]
+    ? Lyrics.lines[Lyrics.index + 1]
+    : " ";
+}
+function loadLocal() {
+  let x = localStorage.getItem("lyrics");
+
+  if (x) {
+    let load = JSON.parse(x);
+    Lyrics.raw = load.raw;
+    Lyrics.lines = load.lines;
+    Lyrics.index = load.index;
+    edit.value = load.raw;
+    render();
+  }
+}
+function saveLocal() {
+  localStorage.setItem("lyrics", JSON.stringify(Lyrics));
+}
+function onchange(e) {
+  let raw = e.target.value;
+  Lyrics.raw = raw;
+  Lyrics.lines = raw.split(/\n+/g);
+  render();
+  saveLocal();
+}
+toggle.addEventListener("click", (e) => {
+  document.querySelector("#edit").classList.toggle("hide");
+  show.classList.toggle("hide");
+});
+edit.addEventListener("change", onchange);
+window.addEventListener("keydown", (e) => {
+  if (e.key == "ArrowRight") {
+    Lyrics.index += 1 * (Lyrics.index < Lyrics.lines.length - 1);
+  }
+  if (e.key == "ArrowLeft") {
+    Lyrics.index -= 1 * (Lyrics.index > 0);
+  }
+  render();
+});
+
+loadLocal();
+
+</script>
+</body>
+</html>
